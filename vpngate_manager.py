@@ -739,11 +739,20 @@ def run_openvpn_until_ready(config_file: str, keep_alive: bool, route_nopull: bo
     def reader() -> None:
         assert process.stdout is not None
         for line in process.stdout:
+            line_str = line.rstrip()
+            level = "INFO"
+            line_lower = line_str.lower()
+            if "error" in line_lower or "failed" in line_lower or "cannot" in line_lower or "fatal" in line_lower or "permission denied" in line_lower:
+                level = "ERROR"
+            elif "warning" in line_lower or "warn" in line_lower or "deprecated" in line_lower:
+                level = "WARNING"
+            log_to_json(level, "VPN", f"[OpenVPN] {line_str}")
+            
             if not startup_done[0]:
-                lines.put(line.rstrip())
+                lines.put(line_str)
             else:
                 if keep_alive:
-                    print(f"[OpenVPN] {line.rstrip()}", flush=True)
+                    print(f"[OpenVPN] {line_str}", flush=True)
         if not startup_done[0]:
             lines.put(None)
 
@@ -763,7 +772,7 @@ def run_openvpn_until_ready(config_file: str, keep_alive: bool, route_nopull: bo
             break
         if line:
             tail.append(line)
-            tail = tail[-8:]
+            tail = tail[-50:]
             if keep_alive:
                 print(f"[OpenVPN] {line}", flush=True)
         lower = line.lower()
@@ -2626,6 +2635,11 @@ INDEX_HTML = r"""<!doctype html>
 
 
   <section class="toolbar">
+    <select id="status_filter">
+      <option value="available">可用节点</option>
+      <option value="all">全部节点</option>
+      <option value="unavailable">失效节点</option>
+    </select>
     <select id="country_filter">
       <option value="">所有国家</option>
     </select>
@@ -3069,6 +3083,7 @@ function getFilteredNodes() {
   const q = $("search").value.toLowerCase();
   const selectedCountry = $("country_filter").value;
   const selectedIpType = $("ip_type_filter").value;
+  const selectedStatus = $("status_filter").value;
   return nodes.filter(n => {
     if (!n) return false;
     if (selectedCountry && n.country !== selectedCountry) {
@@ -3081,6 +3096,12 @@ function getFilteredNodes() {
       if (selectedIpType === "hosting" && n.ip_type !== "hosting") {
         return false;
       }
+    }
+    if (selectedStatus === "available" && n.probe_status === "unavailable" && !n.active) {
+      return false;
+    }
+    if (selectedStatus === "unavailable" && (n.probe_status !== "unavailable" || n.active)) {
+      return false;
     }
     const searchStr = [
       n.country || "", n.country_short || "", n.ip || "", n.remote_host || "", n.proto || "",
@@ -3498,6 +3519,7 @@ async function load(){
 $("search").oninput=()=>{ currentPage = 1; render(); };
 $("country_filter").onchange=()=>{ currentPage = 1; render(); };
 $("ip_type_filter").onchange=()=>{ currentPage = 1; render(); };
+$("status_filter").onchange=()=>{ currentPage = 1; render(); };
 
 $("refresh").onclick=async()=>{ 
   $("refresh").disabled=true; 

@@ -556,6 +556,9 @@ def diagnose_openvpn_failure(log_tail: list[str]) -> tuple[int, str]:
     if "connection refused" in joined_log:
         return 2004, "[ERR_OVPN_NODE_UNREACHABLE] 节点连接被拒绝。原因: 目的服务器未在指定端口监听，或者主动拒绝了连接。"
         
+    if "permission denied" in joined_log or "root privileges" in joined_log or "need root" in joined_log:
+        return 2002, "[ERR_OVPN_PERMISSION_DENIED] 权限不足。原因: 运行 OpenVPN 需要 root 权限，请确保以 root 用户身份或使用 sudo 运行本系统。"
+
     if "options error" in joined_log:
         return 2007, "[ERR_OVPN_ROUTE_NOPULL] 获取/解析 PUSH 配置参数冲突。原因: 某些推送选项在当前版本的客户端或配置环境中不可用。"
         
