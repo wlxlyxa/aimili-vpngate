@@ -38,7 +38,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/wlxlyxa/aimili-vpngate/main/in
    - **固定 IP 节点**：始终锁定连接到这一个特定节点。
 
 #### 第三步：使用本机代理 (核心步骤)
-为了防止代理端口暴露至公网被恶意扫描和滥用，AimiliVPN 的双效代理服务（默认端口 **`7928`**，自适应支持 SOCKS5 和 HTTP 协议）**默认仅绑定在本地回环地址（`127.0.0.1`）**，只接收 VPS 本机上的流量，不对外机提供代理。
+为了防止代理端口暴露至公网被恶意扫描和滥用，叁拾vpn 的双效代理服务（默认端口 **`7928`**，自适应支持 SOCKS5 和 HTTP 协议）**默认仅绑定在本地回环地址（`127.0.0.1`）**，只接收 VPS 本机上的流量，不对外机提供代理。
 
 * **🐍 Python 脚本中使用代理**:
   ```python
@@ -107,7 +107,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/wlxlyxa/aimili-vpngate/main/in
 <a name="english"></a>
 ## English
 
-AimiliVPN is a high-performance, zero-dependency VPN proxy gateway built entirely using Python's standard library. It parses official VPNGate servers, benchmarks latency, and routes traffic through a built-in dual-protocol (HTTP/SOCKS5) proxy server.
+叁拾vpn is a high-performance, zero-dependency VPN proxy gateway built entirely using Python's standard library. It parses official VPNGate servers, benchmarks latency, and routes traffic through a built-in dual-protocol (HTTP/SOCKS5) proxy server.
 
 
 ### 🚀 One-Click Installation
